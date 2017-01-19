@@ -25,25 +25,12 @@ namespace ASPNetCoreBase
                 app.UseDeveloperExceptionPage();
             }
 
-            app.Use( WinOrLoose );
+            app.UseMiddleware<WinOrLooseMiddleware>();
 
             app.Run(async (context) =>
             {
                 await context.Response.WriteAsync("Hello World!");
             });
-        }
-
-        async Task WinOrLoose( HttpContext ctx, Func<Task> nextMiddleware )
-        {
-            if( Environment.TickCount % 2 == 0 )
-            {
-                await ctx.Response.WriteAsync("LOOSE!");
-            }
-            else
-            {
-                await ctx.Response.WriteAsync("OK, you win! => ");
-                await nextMiddleware();
-            }
         }
 
     }
