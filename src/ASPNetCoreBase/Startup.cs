@@ -25,7 +25,7 @@ namespace ASPNetCoreBase
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMiddleware<WinOrLooseMiddleware>();
+            app.UseWinOrLoose();
 
             app.Run(async (context) =>
             {
