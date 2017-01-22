@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace ASPNetCoreBase
 {
+
     public class SampleApplicationBuilder
     {
         readonly IList<Func<RequestDelegate, RequestDelegate>> _components = new List<Func<RequestDelegate, RequestDelegate>>();
@@ -14,7 +15,7 @@ namespace ASPNetCoreBase
         /// Adds a middleware delegate to the application's request pipeline.
         /// </summary>
         /// <param name="middleware">The middleware delegate.</param>
-        /// <returns>The Microsoft.AspNetCore.Builder.IApplicationBuilder.</returns>
+        /// <returns>This SampleApplicationBuilder.</returns>
         public SampleApplicationBuilder Use(Func<RequestDelegate, RequestDelegate> middleware)
         {
             _components.Add(middleware);
@@ -25,7 +26,7 @@ namespace ASPNetCoreBase
         /// Adds a middleware delagate defined in-line to the application's request pipeline.
         /// </summary>
         /// <param name="middleware">A function that handles the request or calls the given next function.</param>
-        /// <returns>The <see cref="IApplicationBuilder"/> instance.</returns>
+        /// <returns>This SampleApplicationBuilder.</returns>
         public SampleApplicationBuilder Use(Func<HttpContext, Func<Task>, Task> middleware)
         {
             return Use( next =>
@@ -66,4 +67,5 @@ namespace ASPNetCoreBase
         }
 
     }
+
 }

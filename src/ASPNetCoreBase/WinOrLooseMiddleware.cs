@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,16 +13,19 @@ namespace ASPNetCoreBase
     {
         readonly RequestDelegate _next;
         readonly ILogger _logger;
+        readonly WinOrLooseOptions _options;
 
-        public WinOrLooseMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
+        public WinOrLooseMiddleware(RequestDelegate next, ILoggerFactory loggerFactory, IOptions<WinOrLooseOptions> option)
         {
             _next = next;
             _logger = loggerFactory.CreateLogger<WinOrLooseMiddleware>();
+            _options = option.Value;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context )
         {
-            if (Environment.TickCount % 2 == 0)
+            await context.Response.WriteAsync($"FYI, OneOutOf: {_options.OneOutOf}{Environment.NewLine}");
+            if (Environment.TickCount % _options.OneOutOf == 0)
             {
                 _logger.LogWarning("Loose happened!");
                 await context.Response.WriteAsync("LOOSE!");

@@ -11,8 +11,11 @@ using Microsoft.Extensions.Configuration;
 
 namespace ASPNetCoreBase
 {
+
     public class Startup
     {
+        public IConfigurationRoot Configuration { get; }
+
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -23,10 +26,10 @@ namespace ASPNetCoreBase
             Configuration = builder.Build();
         }
 
-        public IConfigurationRoot Configuration { get; }
-
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddOptions();
+            services.Configure<WinOrLooseOptions>(Configuration.GetSection("WinOrLoose"));
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -44,6 +47,7 @@ namespace ASPNetCoreBase
             {
                 await context.Response.WriteAsync("Hello World!");
             });
+
         }
 
     }
