@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using System.Security.Claims;
 
 namespace ASPNetCoreBase
 {
@@ -30,6 +31,7 @@ namespace ASPNetCoreBase
         {
             services.AddOptions();
             services.Configure<WinOrLooseOptions>(Configuration.GetSection("WinOrLoose"));
+            services.AddAuthentication();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -40,6 +42,37 @@ namespace ASPNetCoreBase
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCookieAuthentication(new CookieAuthenticationOptions()
+            {
+                AuthenticationScheme = "TheMarvellousCookie"
+            });
+
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.Path.StartsWithSegments("/login"))
+                {
+                    var identity = new ClaimsIdentity();
+                    identity.AddClaim(new Claim("name", "toto"));
+                    ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+                    await context.Authentication.SignInAsync("TheMarvellousCookie", principal);
+                }
+                else if (context.Request.Path.StartsWithSegments("/logout"))
+                {
+                    await context.Authentication.SignOutAsync("TheMarvellousCookie");
+                }
+                await next();
+            });
+
+            app.Use(async (context, next) =>
+            {
+                ClaimsPrincipal principal = await context.Authentication.AuthenticateAsync("TheMarvellousCookie");
+                string name = principal == null 
+                                ? "Anonymous" 
+                                : principal.Identities.First().Claims.Single(c => c.Type == "name").Value;
+                await context.Response.WriteAsync($"Hello {name}{Environment.NewLine}" );
+                await next();
+            });
 
             app.UseWinOrLoose();
 
