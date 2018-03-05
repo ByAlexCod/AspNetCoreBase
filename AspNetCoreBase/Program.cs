@@ -11,6 +11,19 @@ namespace AspNetCoreBase
         {
             var builder = new WebHostBuilder()
                 .UseContentRoot( Directory.GetCurrentDirectory() )
+                .ConfigureAppConfiguration( ( hostingContext, confBuilder ) =>
+                {
+                    var env = hostingContext.HostingEnvironment;
+                    confBuilder
+                        .AddJsonFile( "appsettings.json",
+                                        optional: true,
+                                        reloadOnChange: true )
+                        .AddJsonFile( $"appsettings.{env.EnvironmentName}.json",
+                                        optional: true,
+                                        reloadOnChange: true )
+                        .AddEnvironmentVariables()
+                        .AddCommandLine( args );
+                } )
                 .ConfigureLogging( ( hostingContext, logging ) =>
                     {
                         logging.AddConfiguration( hostingContext.Configuration.GetSection( "Logging" ) );
