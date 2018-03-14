@@ -13,6 +13,7 @@ namespace AspNetCoreBase
     {
         public void ConfigureServices( IServiceCollection services )
         {
+            services.AddScoped<IWinOrLoseService, DefaultWinOrLoseService>();
         }
 
         public void Configure( IApplicationBuilder app, IHostingEnvironment env )
@@ -21,6 +22,7 @@ namespace AspNetCoreBase
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseMiddleware<WinOrLoseMiddleware>();
             app.Run( async context => await context.Response.WriteAsync( "Hello World!" ) );
         }
     }
